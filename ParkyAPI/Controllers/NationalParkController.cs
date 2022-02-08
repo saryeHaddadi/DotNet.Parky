@@ -27,7 +27,7 @@ public class NationalParkController : Controller
 	/// <returns></returns>
 	[HttpGet]
 	[ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<NationalParkDto>))]
-	public IActionResult GetNaionalParks()
+	public IActionResult GetNationalParks()
 	{
 		var objList = _npRepo.GetNationalParks();
 		var objDto = new List<NationalParkDto>();
