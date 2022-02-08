@@ -1,4 +1,5 @@
-﻿using ParkyAPI.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ParkyAPI.Data;
 using ParkyAPI.Models;
 using ParkyAPI.Repository.IRepository;
 
@@ -36,7 +37,7 @@ public class NationalParkRepository : INationalParkRepository
 
 	public bool NationalParkExists(string name)
 	{
-		return _db.NationalParks.Any(a => String.Equals(a.Name.Trim(), name.Trim(), StringComparison.OrdinalIgnoreCase));
+		return _db.NationalParks.Any(a => a.Name.Trim().ToLower() == name.Trim().ToLower());
 	}
 
 	public bool NationalParkExists(int id)
