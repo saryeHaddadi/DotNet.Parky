@@ -5,7 +5,9 @@ using ParkyAPI.Repository.IRepository;
 
 namespace ParkyAPI.Repository;
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 public class NationalParkRepository : INationalParkRepository
+
 {
 	private ApplicationDbContext _db;
 	public NationalParkRepository(ApplicationDbContext db)
@@ -56,3 +58,4 @@ public class NationalParkRepository : INationalParkRepository
 		return Save();
 	}
 }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
