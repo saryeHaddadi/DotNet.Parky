@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ParkyAPI.Data;
+using ParkyAPI.Repository;
+using ParkyAPI.Repository.IRepository;
+using AutoMapper;
+using ParkyAPI.ParkyMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<INationalParkRepository, NationalParkRepository>();
+builder.Services.AddAutoMapper(typeof(ParkyMappings));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
