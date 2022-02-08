@@ -15,5 +15,4 @@ public class TrailCreateDto
 
 	public int NationalParkId { get; set; }
 
-	public NationalParkDto NationalPark { get; set; }
 }
