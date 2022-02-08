@@ -10,5 +10,6 @@ public class ParkyMappings : Profile
 	{
 		CreateMap<NationalPark, NationalParkDto>().ReverseMap();
 		CreateMap<Trail, TrailDto>().ReverseMap();
+		CreateMap<Trail, TrailUpsertDto>().ReverseMap();
 	}
 }
