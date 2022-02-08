@@ -72,7 +72,7 @@ public class TrailController : Controller
 	[ProducesResponseType(StatusCodes.Status201Created, Type = typeof(TrailDto))]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-	public IActionResult CreateTrail([FromBody] TrailUpsertDto trailDto)
+	public IActionResult CreateTrail([FromBody] TrailCreateDto trailDto)
 	{
 		if (trailDto == null)
 		{
@@ -99,7 +99,7 @@ public class TrailController : Controller
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
 	[ProducesResponseType(StatusCodes.Status404NotFound)]
 	[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-	public IActionResult UpdateTrail(int trailId, [FromBody] TrailUpsertDto trailDto)
+	public IActionResult UpdateTrail(int trailId, [FromBody] TrailUpdateDto trailDto)
 	{
 		if (trailDto == null || trailId != trailDto.Id)
 		{

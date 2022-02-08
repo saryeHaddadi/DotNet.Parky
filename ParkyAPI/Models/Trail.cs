@@ -18,11 +18,10 @@ public class Trail
 
 	public DifficultyType Difficulty { get; set; }
 
+	[Required]
 	public int NationalParkId { get; set; }
 
 	[ForeignKey(nameof(NationalParkId))]
 	public NationalPark NationalPark { get; set; }
-
-	public DateTime DateCreated { get; set; }
 
 }
