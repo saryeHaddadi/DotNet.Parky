@@ -5,73 +5,55 @@ using ParkyAPI.Repository.IRepository;
 using AutoMapper;
 using ParkyAPI.ParkyMapper;
 using System.Reflection;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using ParkyAPI;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddControllers();
+
 builder.Services.AddScoped<INationalParkRepository, NationalParkRepository>();
 builder.Services.AddScoped<ITrailRepository, TrailRepository>();
 builder.Services.AddAutoMapper(typeof(ParkyMappings));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options => {
-	options.SwaggerDoc("ParkyOpenAPISpecNP",
-		new Microsoft.OpenApi.Models.OpenApiInfo()
-		{
-			Title = "Parky API (National Parks)",
-			Version = "1",
-			Description = "Udemy Parky API",
-			Contact = new Microsoft.OpenApi.Models.OpenApiContact()
-			{
-				Email = "sarye.dev@outlook.fr",
-				Name = "Sarye HADDADI",
-				Url = new Uri("https://www.sarye.com")
-			},
-			License = new Microsoft.OpenApi.Models.OpenApiLicense()
-			{
-				Name = "MIT License",
-				Url = new Uri("https://en.wikipedia.org/wiki/MIT_License")
-			}
-		});
-	options.SwaggerDoc("ParkyOpenAPISpecTrails",
-		new Microsoft.OpenApi.Models.OpenApiInfo()
-		{
-			Title = "Parky API Trails",
-			Version = "1",
-			Description = "Udemy Parky API",
-			Contact = new Microsoft.OpenApi.Models.OpenApiContact()
-			{
-				Email = "sarye.dev@outlook.fr",
-				Name = "Sarye HADDADI",
-				Url = new Uri("https://www.sarye.com")
-			},
-			License = new Microsoft.OpenApi.Models.OpenApiLicense()
-			{
-				Name = "MIT License",
-				Url = new Uri("https://en.wikipedia.org/wiki/MIT_License")
-			}
-		});
-	var xmlCommentFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-	var xmlCommentFileFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentFile);
-	Console.WriteLine(xmlCommentFileFullPath);
-	options.IncludeXmlComments(xmlCommentFileFullPath);
-});
 
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddApiVersioning(options =>
+{
+	options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+	options.AssumeDefaultVersionWhenUnspecified = true;
+	options.ReportApiVersions = true;
+	options.ApiVersionReader = ApiVersionReader.Combine(new UrlSegmentApiVersionReader(),
+												new HeaderApiVersionReader("x-api-version"),
+												new MediaTypeApiVersionReader("x-api-version"));
+});
+builder.Services.AddVersionedApiExplorer(options =>
+{
+	options.GroupNameFormat = "'v'VVV";
+	options.SubstituteApiVersionInUrl = true;
+});
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
-
+var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
 	app.UseSwaggerUI(options =>
 	{
-		options.SwaggerEndpoint("/swagger/ParkyOpenAPISpecNP/swagger.json", "Parky API NP");
-		options.SwaggerEndpoint("/swagger/ParkyOpenAPISpecTrails/swagger.json", "Parky API Trails");
+		foreach(var desc in apiVersionDescriptionProvider.ApiVersionDescriptions.Reverse())
+		{
+			options.SwaggerEndpoint($"/swagger/{desc.GroupName}/swagger.json",
+				desc.GroupName.ToUpperInvariant());
+		}
 		options.RoutePrefix = "";
 	});
 }

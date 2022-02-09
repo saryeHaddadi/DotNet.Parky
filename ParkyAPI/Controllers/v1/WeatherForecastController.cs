@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace ParkyAPI.Controllers;
+namespace ParkyAPI.Controllers.v1;
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase

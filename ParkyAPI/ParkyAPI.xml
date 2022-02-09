@@ -4,30 +4,43 @@
         <name>ParkyAPI</name>
     </assembly>
     <members>
-        <member name="M:ParkyAPI.Controllers.NationalParkController.GetNationalParks">
+        <member name="M:ParkyAPI.ConfigureSwaggerOptions.CreateVersionInfo(Microsoft.AspNetCore.Mvc.ApiExplorer.ApiVersionDescription)">
+            <summary>
+            Create information about the version of the API
+            </summary>
+            <param name="description"></param>
+            <returns>Information about the API</returns>
+        </member>
+        <member name="M:ParkyAPI.Controllers.v1.NationalParkController.GetNationalParks">
             <summary>
             Get the list of all National Parks
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ParkyAPI.Controllers.NationalParkController.GetNationalPark(System.Int32)">
+        <member name="M:ParkyAPI.Controllers.v1.NationalParkController.GetNationalPark(System.Int32)">
             <summary>
             Get an indivual National Park
             </summary>
             <param name="nationalParkId">The Id of the National Park</param>
             <returns></returns>
         </member>
-        <member name="M:ParkyAPI.Controllers.TrailController.GetTrails">
+        <member name="M:ParkyAPI.Controllers.v1.TrailController.GetTrails">
             <summary>
             Get the list of all Trails
             </summary>
             <returns></returns>
         </member>
-        <member name="M:ParkyAPI.Controllers.TrailController.GetTrail(System.Int32)">
+        <member name="M:ParkyAPI.Controllers.v1.TrailController.GetTrail(System.Int32)">
             <summary>
             Get an indivual Trail
             </summary>
             <param name="trailId">The Id of the Trail</param>
+            <returns></returns>
+        </member>
+        <member name="M:ParkyAPI.Controllers.v2.NationalParkController.GetNationalParks">
+            <summary>
+            Get the list of all National Parks
+            </summary>
             <returns></returns>
         </member>
     </members>
