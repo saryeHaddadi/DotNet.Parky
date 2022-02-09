@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace ParkyWeb.Models;
 
@@ -11,11 +12,13 @@ public class Trail
 
 	[Required]
 	public double Distance { get; set; }
+	[Required]
+	public double Elevation { get; set; }
 	public enum DifficultyType { Easy, Moderate, Difficult, Expert }
 
 	public DifficultyType Difficulty { get; set; }
 
 	public int NationalParkId { get; set; }
-
+	[ValidateNever]
 	public NationalPark NationalPark { get; set; }
 }

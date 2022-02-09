@@ -46,7 +46,7 @@ public class NationalParkController : Controller
 				byte[] picture1 = null;
 				using (var fs1 = files[0].OpenReadStream())
 				{
-					using(var ms1 = new MemoryStream())
+					using (var ms1 = new MemoryStream())
 					{
 						fs1.CopyTo(ms1);
 						picture1 = ms1.ToArray();
