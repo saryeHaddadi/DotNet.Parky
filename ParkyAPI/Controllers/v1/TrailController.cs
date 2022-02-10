@@ -12,7 +12,7 @@ namespace ParkyAPI.Controllers.v1;
 [ApiController]
 //[ApiExplorerSettings(GroupName = "ParkyOpenAPISpecTrails")]
 [ProducesResponseType(StatusCodes.Status400BadRequest)]
-public class TrailController : Controller
+public class TrailController : ControllerBase
 {
 	private ITrailRepository _trailRepo;
 	private readonly IMapper _mapper;
