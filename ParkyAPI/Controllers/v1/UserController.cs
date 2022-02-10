@@ -29,4 +29,22 @@ public class UserController : ControllerBase
 		}
 		return Ok(user);
 	}
+
+	[AllowAnonymous]
+	[HttpPost("register")]
+	public IActionResult Register([FromBody] User model)
+	{
+		bool isUserNameUnique = _userRepo.IsUniqueUser(model.Username);
+		if(!isUserNameUnique)
+		{
+			return BadRequest(new { message = "Username already exists" });
+		}
+
+		var user = _userRepo.Register(model.Username, model.Password);
+		if(user == null)
+		{
+			return BadRequest(new { message = "Error while registering" });
+		}
+		return Ok();
+	}
 }
