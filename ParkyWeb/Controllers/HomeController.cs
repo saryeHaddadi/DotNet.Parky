@@ -9,12 +9,14 @@ public class HomeController : Controller
 {
 	private readonly ILogger<HomeController> _logger;
 	private readonly INationalParkRepository _npRepo;
+	private readonly IAccountRepository _accountRepo;
 	private readonly ITrailRepository _trailRepo;
 
-	public HomeController(ILogger<HomeController> logger,
+	public HomeController(ILogger<HomeController> logger, IAccountRepository accountRepo,
 		ITrailRepository trailRepo, INationalParkRepository npRepo)
 	{
 		_logger = logger;
+		_accountRepo = accountRepo;
 		_trailRepo = trailRepo;
 		_npRepo = npRepo;
 	}
@@ -30,9 +32,49 @@ public class HomeController : Controller
 		return View(obj);
 	}
 
-	public IActionResult Privacy()
+	[HttpGet]
+	public IActionResult Login()
+	{
+		var user = new User();
+		return View(user);
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> Login(User obj)
+	{
+		var objUser = await _accountRepo.LoginAsync(SD.AccountApiPath + "authenticate/", obj);
+		if (objUser.Token is null)
+		{
+			return View();
+		}
+		HttpContext.Session.SetString("JWToken", objUser.Token);
+		return RedirectToAction(nameof(Index));
+	}
+
+	[HttpGet]
+	public IActionResult Register()
 	{
 		return View();
+	}
+
+	[HttpPost]
+	[ValidateAntiForgeryToken]
+	public async Task<IActionResult> Register(User obj)
+	{
+		var registered = await _accountRepo.RegisterAsync(SD.AccountApiPath + "register/", obj);
+		if (!registered)
+		{
+			return View();
+		}
+		return RedirectToAction(nameof(Login));
+	}
+
+	[HttpGet]
+	public IActionResult Logout()
+	{
+		HttpContext.Session.SetString("JWToken", "");
+		return RedirectToAction(nameof(Index));
 	}
 
 	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
