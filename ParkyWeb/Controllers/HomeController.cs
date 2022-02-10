@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using ParkyWeb.Models;
 using ParkyWeb.Models.ViewModel;
 using ParkyWeb.Repository.Interface;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace ParkyWeb.Controllers;
 public class HomeController : Controller
@@ -21,6 +24,11 @@ public class HomeController : Controller
 		_npRepo = npRepo;
 	}
 
+	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+	public IActionResult Error()
+	{
+		return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+	}
 
 	public async Task<IActionResult> Index()
 	{
@@ -48,7 +56,13 @@ public class HomeController : Controller
 		{
 			return View();
 		}
-		HttpContext.Session.SetString("JWToken", objUser.Token);
+
+		var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+		identity.AddClaim(new Claim(ClaimTypes.Name, objUser.Username));
+		identity.AddClaim(new Claim(ClaimTypes.Role, objUser.Role));
+		var principal = new ClaimsPrincipal(identity);
+		await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal); // User signed in
+		HttpContext.Session.SetString("JWToken", objUser.Token); // Needed for API calls
 		return RedirectToAction(nameof(Index));
 	}
 
@@ -71,15 +85,16 @@ public class HomeController : Controller
 	}
 
 	[HttpGet]
-	public IActionResult Logout()
+	public async Task<IActionResult> Logout()
 	{
+		await HttpContext.SignOutAsync();
 		HttpContext.Session.SetString("JWToken", "");
 		return RedirectToAction(nameof(Index));
 	}
 
-	[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-	public IActionResult Error()
+	[HttpGet]
+	public IActionResult AccessDenied()
 	{
-		return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+		return View();
 	}
 }
