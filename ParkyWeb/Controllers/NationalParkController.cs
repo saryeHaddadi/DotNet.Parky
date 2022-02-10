@@ -26,7 +26,7 @@ public class NationalParkController : Controller
 		}
 
 		// Update
-		obj = await _npRepo.GetAsync(SD.NationalParkApiPath, id.GetValueOrDefault());
+		obj = await _npRepo.GetAsync(SD.NationalParkApiPath, id.GetValueOrDefault(), HttpContext.Session.GetString("JWToken"));
 		if (obj is null)
 		{
 			return NotFound();
@@ -56,17 +56,17 @@ public class NationalParkController : Controller
 			}
 			else
 			{
-				var objFromDb = await _npRepo.GetAsync(SD.NationalParkApiPath, obj.Id);
+				var objFromDb = await _npRepo.GetAsync(SD.NationalParkApiPath, obj.Id, HttpContext.Session.GetString("JWToken"));
 				obj.Picture = objFromDb.Picture;
 			}
 
 			if (obj.Id == 0)
 			{
-				await _npRepo.CreateAsync(SD.NationalParkApiPath, obj);
+				await _npRepo.CreateAsync(SD.NationalParkApiPath, obj, HttpContext.Session.GetString("JWToken"));
 			}
 			else
 			{
-				await _npRepo.UpdateAsync(SD.NationalParkApiPath + obj.Id, obj);
+				await _npRepo.UpdateAsync(SD.NationalParkApiPath + obj.Id, obj, HttpContext.Session.GetString("JWToken"));
 			}
 
 			return RedirectToAction(nameof(Index));
@@ -79,13 +79,13 @@ public class NationalParkController : Controller
 
 	public async Task<IActionResult> GetAllNationalParks()
 	{
-		return Json(new { data = await _npRepo.GetAllAsync(SD.NationalParkApiPath) });
+		return Json(new { data = await _npRepo.GetAllAsync(SD.NationalParkApiPath, HttpContext.Session.GetString("JWToken")) });
 	}
 
 	[HttpDelete]
 	public async Task<IActionResult> Delete(int id)
 	{
-		var status = await _npRepo.DeleteAsync(SD.NationalParkApiPath, id);
+		var status = await _npRepo.DeleteAsync(SD.NationalParkApiPath, id, HttpContext.Session.GetString("JWToken"));
 		if (status)
 		{
 			return Json(new { success = true, message = "Delete Successful" });

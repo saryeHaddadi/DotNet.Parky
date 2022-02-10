@@ -1,9 +1,20 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using ParkyWeb.Repository;
 using ParkyWeb.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie(options =>
+	{
+		options.Cookie.HttpOnly = true;
+		options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+		options.SlidingExpiration = true;
+		options.LoginPath = "/Home/login";
+		options.LogoutPath = "/Home/AccessDenied";
+	});
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
