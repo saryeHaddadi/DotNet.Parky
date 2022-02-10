@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ParkyWeb.Models;
 using ParkyWeb.Models.ViewModel;
 using ParkyWeb.Repository.Interface;
 
 namespace ParkyWeb.Controllers;
+
+[Authorize]
 public class TrailController : Controller
 {
 	private readonly INationalParkRepository _npRepo;
@@ -19,6 +22,7 @@ public class TrailController : Controller
 		return View(new Trail() { });
 	}
 
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Upsert(int? id)
 	{
 		var npList = await _npRepo.GetAllAsync(SD.NationalParkApiPath, HttpContext.Session.GetString("JWToken"));
@@ -49,6 +53,7 @@ public class TrailController : Controller
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Upsert(TrailViewModel obj)
 	{
 		if (ModelState.IsValid)
@@ -86,6 +91,7 @@ public class TrailController : Controller
 	}
 
 	[HttpDelete]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Delete(int id)
 	{
 		var status = await _trailRepo.DeleteAsync(SD.TrailApiPath, id, HttpContext.Session.GetString("JWToken"));

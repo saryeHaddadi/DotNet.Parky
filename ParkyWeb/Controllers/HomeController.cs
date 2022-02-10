@@ -62,7 +62,9 @@ public class HomeController : Controller
 		identity.AddClaim(new Claim(ClaimTypes.Role, objUser.Role));
 		var principal = new ClaimsPrincipal(identity);
 		await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal); // User signed in
+		
 		HttpContext.Session.SetString("JWToken", objUser.Token); // Needed for API calls
+		TempData["alert"] = "Welcome " + objUser.Username;
 		return RedirectToAction(nameof(Index));
 	}
 
@@ -81,6 +83,7 @@ public class HomeController : Controller
 		{
 			return View();
 		}
+		TempData["alert"] = "Registration Successful!";
 		return RedirectToAction(nameof(Login));
 	}
 

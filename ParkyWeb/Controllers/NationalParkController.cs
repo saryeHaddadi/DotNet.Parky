@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ParkyWeb.Models;
 using ParkyWeb.Repository.Interface;
 
 namespace ParkyWeb.Controllers;
+
+[Authorize]
 public class NationalParkController : Controller
 {
 	private readonly INationalParkRepository _npRepo;
@@ -15,6 +18,7 @@ public class NationalParkController : Controller
 		return View(new NationalPark() { });
 	}
 
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Upsert(int? id)
 	{
 		var obj = new NationalPark();
@@ -36,6 +40,7 @@ public class NationalParkController : Controller
 
 	[HttpPost]
 	[ValidateAntiForgeryToken]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Upsert(NationalPark obj)
 	{
 		if (ModelState.IsValid)
@@ -83,6 +88,7 @@ public class NationalParkController : Controller
 	}
 
 	[HttpDelete]
+	[Authorize(Roles = "Admin")]
 	public async Task<IActionResult> Delete(int id)
 	{
 		var status = await _npRepo.DeleteAsync(SD.NationalParkApiPath, id, HttpContext.Session.GetString("JWToken"));
