@@ -10,6 +10,9 @@ using ParkyAPI;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +43,30 @@ builder.Services.AddVersionedApiExplorer(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
+var appSettingsSection = builder.Configuration.GetSection("AppSettings");
+builder.Services.Configure<AppSettings>(appSettingsSection);
+
+var appSettings = appSettingsSection.Get<AppSettings>();
+var key = Encoding.ASCII.GetBytes(appSettings.SecretKey);
+builder.Services.AddAuthentication(x =>
+{
+	x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+	x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+	.AddJwtBearer(x =>
+	{
+		x.RequireHttpsMetadata = false;
+		x.SaveToken = true;
+		x.TokenValidationParameters = new TokenValidationParameters
+		{
+			ValidateIssuerSigningKey = true,
+			IssuerSigningKey = new SymmetricSecurityKey(key),
+			ValidateIssuer = false,
+			ValidateAudience = false,
+		};
+	});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -50,7 +77,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI(options =>
 	{
-		foreach(var desc in apiVersionDescriptionProvider.ApiVersionDescriptions.Reverse())
+		foreach (var desc in apiVersionDescriptionProvider.ApiVersionDescriptions.Reverse())
 		{
 			options.SwaggerEndpoint($"/swagger/{desc.GroupName}/swagger.json",
 				desc.GroupName.ToUpperInvariant());
@@ -58,7 +85,11 @@ if (app.Environment.IsDevelopment())
 		options.RoutePrefix = "";
 	});
 }
-
+app.UseCors(x => x
+	.AllowAnyOrigin()
+	.AllowAnyMethod()
+	.AllowAnyHeader());
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
